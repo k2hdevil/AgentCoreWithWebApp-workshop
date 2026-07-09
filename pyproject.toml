@@ -1,0 +1,23 @@
+[project]
+name = "sample-amazon-bedrock-agentcore-onboarding"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "bedrock-agentcore>=0.1.1",
+    "bedrock-agentcore-starter-toolkit>=0.1.2",
+    "boto3>=1.39.9",
+    "fastapi>=0.139.0",
+    "playwright>=1.58.0",
+    "pyyaml>=6.0.3",
+    "ruff>=0.12.4",
+    "strands-agents>=1.0.1",
+    "strands-agents-evals>=0.1.6",
+    "strands-agents-tools>=0.2.1",
+    "uvicorn>=0.48.0",
+]
+
+[tool.pyright]
+typeCheckingMode = "off"
+ignore = ["*"]

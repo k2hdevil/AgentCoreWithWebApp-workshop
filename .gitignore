@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[codz]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# AWS / AgentCore
+.bedrock_agentcore/
+.aws-sam/
+samconfig.toml
+
+# Secrets & credentials (DO NOT commit)
+# inbound_authorizer.json contains Cognito client_secret
+agent/inbound_authorizer.json
+gateway/outbound_gateway.json
+
+# AgentCore deploy artifacts
+agent/.bedrock_agentcore.yaml
+
+# Ruff / linting cache
+.ruff_cache/
+
+# UV cache
+.uv/
+
+# Misc
+.agentcore.json
+uv.lock

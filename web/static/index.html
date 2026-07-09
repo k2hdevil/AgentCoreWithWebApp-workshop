@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Cost Estimator - AgentCore Runtime</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f1419;
+            color: #e7e9ea;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: #1a1f2e;
+            border-bottom: 1px solid #2d3748;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff9900, #ff6600);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .header-text h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .header-text p {
+            font-size: 12px;
+            color: #8899a6;
+            margin-top: 2px;
+        }
+
+        .status-badge {
+            margin-left: auto;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .status-badge.healthy {
+            background: #132f1e;
+            color: #4ade80;
+            border: 1px solid #166534;
+        }
+
+        .status-badge.error {
+            background: #3b1111;
+            color: #f87171;
+            border: 1px solid #7f1d1d;
+        }
+
+        .status-badge.loading {
+            background: #1e293b;
+            color: #94a3b8;
+            border: 1px solid #334155;
+        }
+
+        /* Chat Area */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 48px 24px;
+            color: #8899a6;
+        }
+
+        .welcome-message h2 {
+            font-size: 24px;
+            color: #e7e9ea;
+            margin-bottom: 8px;
+        }
+
+        .welcome-message p {
+            font-size: 14px;
+            line-height: 1.6;
+            max-width: 500px;
+            margin: 0 auto 24px;
+        }
+
+        .example-prompts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .example-prompt {
+            background: #1a1f2e;
+            border: 1px solid #2d3748;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .example-prompt:hover {
+            background: #242b3d;
+            border-color: #ff9900;
+            color: #ff9900;
+        }
+
+        /* Messages */
+        .message {
+            display: flex;
+            gap: 12px;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: #1d4ed8;
+        }
+
+        .message.assistant .message-avatar {
+            background: linear-gradient(135deg, #ff9900, #ff6600);
+        }
+
+        .message-content {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.7;
+            word-break: break-word;
+        }
+
+        .message.user .message-content {
+            background: #1e3a5f;
+            border: 1px solid #2563eb33;
+            white-space: pre-wrap;
+        }
+
+        .message.assistant .message-content {
+            background: #1a1f2e;
+            border: 1px solid #2d3748;
+        }
+
+        .message-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 12px 0;
+            font-size: 13px;
+        }
+
+        .message-content table th,
+        .message-content table td {
+            border: 1px solid #2d3748;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .message-content table th {
+            background: #242b3d;
+            font-weight: 600;
+        }
+
+        .message-content code {
+            background: #242b3d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+        }
+
+        .message-content pre {
+            background: #0d1117;
+            border: 1px solid #2d3748;
+            border-radius: 8px;
+            padding: 12px 16px;
+            overflow-x: auto;
+            margin: 8px 0;
+        }
+
+        .message-content pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* Markdown rendered content in assistant messages */
+        .message.assistant .message-content h2,
+        .message.assistant .message-content h3 {
+            margin-top: 16px;
+            margin-bottom: 8px;
+            color: #f0f0f0;
+        }
+
+        .message.assistant .message-content h2 {
+            font-size: 16px;
+            border-bottom: 1px solid #2d3748;
+            padding-bottom: 6px;
+        }
+
+        .message.assistant .message-content h3 {
+            font-size: 14px;
+        }
+
+        .message.assistant .message-content p {
+            margin: 8px 0;
+        }
+
+        .message.assistant .message-content ul,
+        .message.assistant .message-content ol {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .message.assistant .message-content li {
+            margin: 4px 0;
+        }
+
+        .message.assistant .message-content blockquote {
+            border-left: 3px solid #ff9900;
+            padding-left: 12px;
+            margin: 12px 0;
+            color: #94a3b8;
+        }
+
+        .message.assistant .message-content hr {
+            border: none;
+            border-top: 1px solid #2d3748;
+            margin: 16px 0;
+        }
+
+        .message.assistant .message-content strong {
+            color: #ffffff;
+        }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 4px 0;
+        }
+
+        .typing-indicator span {
+            width: 6px;
+            height: 6px;
+            background: #ff9900;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-6px); }
+        }
+
+        /* Input Area */
+        .input-container {
+            background: #1a1f2e;
+            border-top: 1px solid #2d3748;
+            padding: 16px 24px;
+        }
+
+        .input-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .input-field {
+            flex: 1;
+            background: #0f1419;
+            border: 1px solid #2d3748;
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #e7e9ea;
+            font-size: 14px;
+            font-family: inherit;
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-field:focus {
+            border-color: #ff9900;
+        }
+
+        .input-field::placeholder {
+            color: #5b6f82;
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #ff9900, #ff6600);
+            border: none;
+            border-radius: 10px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .send-button:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(255, 153, 0, 0.3);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .send-button svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
+        .input-hint {
+            text-align: center;
+            font-size: 11px;
+            color: #5b6f82;
+            margin-top: 8px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Scrollbar */
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #2d3748;
+            border-radius: 3px;
+        }
+
+        /* Auth info badge (bottom-left) */
+        .auth-info {
+            position: fixed;
+            bottom: 80px;
+            left: 16px;
+            background: #1a1f2e;
+            border: 1px solid #2d3748;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 10px;
+            color: #5b6f82;
+            max-width: 260px;
+            z-index: 10;
+        }
+
+        .auth-info .auth-label {
+            color: #4ade80;
+            font-weight: 500;
+        }
+
+        .auth-info .auth-detail {
+            margin-top: 2px;
+            word-break: break-all;
+            color: #64748b;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .header { padding: 12px 16px; }
+            .chat-container { padding: 16px; }
+            .input-container { padding: 12px 16px; }
+            .example-prompts { flex-direction: column; }
+        }
+    </style>
+    <!-- Markdown renderer -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-icon">$</div>
+        <div class="header-text">
+            <h1>AWS Cost Estimator Agent</h1>
+            <p>Powered by Amazon Bedrock AgentCore Runtime</p>
+        </div>
+        <span id="statusBadge" class="status-badge loading">Connecting...</span>
+        <button onclick="resetSession()" style="margin-left:8px;background:#2d3748;border:1px solid #4a5568;border-radius:8px;padding:4px 12px;color:#94a3b8;font-size:11px;cursor:pointer;" title="새 세션 시작 (메모리 초기화)">새 대화</button>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-container" id="chatContainer">
+        <div class="welcome-message" id="welcomeMessage">
+            <h2>AWS 비용 견적 에이전트</h2>
+            <p>AWS 아키텍처를 설명하면, 실시간 가격 데이터를 기반으로 월간 예상 비용을 계산해 드립니다.</p>
+            <div class="example-prompts">
+                <div class="example-prompt" onclick="useExample(this)">EC2 t3.micro 1대를 24/7 운영하면 비용이 얼마인가요?</div>
+                <div class="example-prompt" onclick="useExample(this)">RDS MySQL db.t3.small + S3 100GB 구성의 비용을 알려주세요</div>
+                <div class="example-prompt" onclick="useExample(this)">Lambda 100만 요청/월 + API Gateway + DynamoDB 비용 견적</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-container">
+
+    <!-- Auth Info (bottom-left) -->
+    <div class="auth-info" id="authInfo" style="display:none;">
+        <span class="auth-label">🔐 Authenticated</span>
+        <div class="auth-detail" id="authDetail"></div>
+    </div>
+        <div class="input-wrapper">
+            <textarea
+                id="promptInput"
+                class="input-field"
+                placeholder="AWS 아키텍처를 설명해 주세요..."
+                rows="1"
+                onkeydown="handleKeyDown(event)"
+                oninput="autoResize(this)"
+            ></textarea>
+            <button class="send-button" id="sendButton" onclick="sendMessage()">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+        </div>
+        <div class="input-hint">Enter를 눌러 전송 | Shift+Enter로 줄바꿈</div>
+    </div>
+
+    <script>
+        // Markdown rendering for assistant messages
+        function renderMarkdown(text) {
+            if (typeof marked !== 'undefined') {
+                marked.setOptions({ breaks: true, gfm: true });
+                return marked.parse(text);
+            }
+            // Fallback: convert \n to <br> if marked is not loaded
+            return text.replace(/\n/g, '<br>');
+        }
+
+        // Session management with localStorage persistence (for AgentCore Memory)
+        let sessionId = localStorage.getItem('agentcore_session_id');
+        if (!sessionId) {
+            // Generate a new session ID (minimum 33 chars for AgentCore)
+            const timestamp = new Date().toISOString().replace(/[-:T.Z]/g, '').slice(0, 15);
+            const uuid = crypto.randomUUID().replace(/-/g, '');
+            sessionId = `webui_${timestamp}_${uuid}`;
+            localStorage.setItem('agentcore_session_id', sessionId);
+        }
+
+        // Conversation history for memory context
+        let conversationHistory = JSON.parse(localStorage.getItem('agentcore_history') || '[]');
+
+        let isStreaming = false;
+
+        // DOM elements
+        const chatContainer = document.getElementById('chatContainer');
+        const promptInput = document.getElementById('promptInput');
+        const sendButton = document.getElementById('sendButton');
+        const statusBadge = document.getElementById('statusBadge');
+        const welcomeMessage = document.getElementById('welcomeMessage');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkHealth();
+            promptInput.focus();
+        });
+
+        async function checkHealth() {
+            try {
+                const res = await fetch('/api/health');
+                const data = await res.json();
+                if (data.status === 'healthy') {
+                    statusBadge.textContent = 'Connected';
+                    statusBadge.className = 'status-badge healthy';
+                    
+                    // Show auth info
+                    const authInfo = document.getElementById('authInfo');
+                    const authDetail = document.getElementById('authDetail');
+                    if (data.auth && authInfo) {
+                        authInfo.style.display = 'block';
+                        authDetail.textContent = `${data.auth} | ${data.provider || ''}`;
+                    }
+                } else {
+                    statusBadge.textContent = 'Error';
+                    statusBadge.className = 'status-badge error';
+                }
+            } catch {
+                statusBadge.textContent = 'Disconnected';
+                statusBadge.className = 'status-badge error';
+            }
+        }
+
+        function useExample(el) {
+            promptInput.value = el.textContent;
+            promptInput.focus();
+            autoResize(promptInput);
+        }
+
+        function resetSession() {
+            // Generate new session ID (clears memory context for this conversation)
+            const timestamp = new Date().toISOString().replace(/[-:T.Z]/g, '').slice(0, 15);
+            const uuid = crypto.randomUUID().replace(/-/g, '');
+            sessionId = `webui_${timestamp}_${uuid}`;
+            localStorage.setItem('agentcore_session_id', sessionId);
+            
+            // Clear conversation history
+            conversationHistory = [];
+            localStorage.setItem('agentcore_history', '[]');
+            
+            // Clear chat UI
+            chatContainer.innerHTML = '';
+            if (welcomeMessage) {
+                chatContainer.appendChild(welcomeMessage);
+                welcomeMessage.style.display = '';
+            }
+        }
+
+        function handleKeyDown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+
+        function addMessage(role, content) {
+            // Hide welcome message on first interaction
+            if (welcomeMessage) {
+                welcomeMessage.style.display = 'none';
+            }
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${role}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = role === 'user' ? '👤' : '🤖';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            if (role === 'assistant' && content) {
+                contentDiv.innerHTML = renderMarkdown(content);
+            } else {
+                contentDiv.textContent = content;
+            }
+
+            msgDiv.appendChild(avatar);
+            msgDiv.appendChild(contentDiv);
+            chatContainer.appendChild(msgDiv);
+            scrollToBottom();
+
+            return contentDiv;
+        }
+
+        function addTypingIndicator() {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message assistant';
+            msgDiv.id = 'typingIndicator';
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = '🤖';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+
+            msgDiv.appendChild(avatar);
+            msgDiv.appendChild(contentDiv);
+            chatContainer.appendChild(msgDiv);
+            scrollToBottom();
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+
+        function scrollToBottom() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const prompt = promptInput.value.trim();
+            if (!prompt || isStreaming) return;
+
+            // Add user message
+            addMessage('user', prompt);
+            conversationHistory.push({role: 'user', content: prompt});
+            promptInput.value = '';
+            promptInput.style.height = 'auto';
+
+            // Disable input
+            isStreaming = true;
+            sendButton.disabled = true;
+            addTypingIndicator();
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        prompt, 
+                        session_id: sessionId,
+                        history: conversationHistory.slice(-10)  // Send last 10 messages for context
+                    }),
+                });
+
+                // Get session ID from header
+                const headerSessionId = res.headers.get('X-Session-Id');
+                if (headerSessionId) {
+                    sessionId = headerSessionId;
+                }
+
+                removeTypingIndicator();
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    addMessage('assistant', `Error: ${errorData.error || 'Unknown error'}`);
+                    return;
+                }
+
+                // Check if streaming response
+                const contentType = res.headers.get('Content-Type') || '';
+
+                if (contentType.includes('text/event-stream')) {
+                    // Handle SSE streaming
+                    const contentDiv = addMessage('assistant', '');
+                    const reader = res.body.getReader();
+                    const decoder = new TextDecoder();
+                    let fullText = '';
+
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+
+                        const text = decoder.decode(value, { stream: true });
+                        const lines = text.split('\n');
+
+                        for (const line of lines) {
+                            if (line.startsWith('data: ')) {
+                                try {
+                                    const data = JSON.parse(line.slice(6));
+                                    if (data.content) {
+                                        fullText += data.content;
+                                        contentDiv.innerHTML = renderMarkdown(fullText);
+                                        scrollToBottom();
+                                    }
+                                    if (data.session_id) {
+                                        sessionId = data.session_id;
+                                    }
+                                    if (data.error) {
+                                        fullText += `\n\nError: ${data.error}`;
+                                        contentDiv.innerHTML = renderMarkdown(fullText);
+                                    }
+                                } catch {
+                                    // Skip malformed JSON lines
+                                }
+                            }
+                        }
+                    }
+                    // Save assistant response to conversation history
+                    if (fullText) {
+                        conversationHistory.push({role: 'assistant', content: fullText});
+                    }
+                } else {
+                    // Handle JSON response
+                    const data = await res.json();
+                    if (data.error) {
+                        addMessage('assistant', `Error: ${data.error}`);
+                    } else {
+                        const content = data.content || JSON.stringify(data);
+                        addMessage('assistant', content);
+                        conversationHistory.push({role: 'assistant', content: content});
+                    }
+                    if (data.session_id) {
+                        sessionId = data.session_id;
+                    }
+                }
+
+            } catch (error) {
+                removeTypingIndicator();
+                addMessage('assistant', `Connection error: ${error.message}`);
+            } finally {
+                // Save conversation history to localStorage
+                localStorage.setItem('agentcore_history', JSON.stringify(conversationHistory));
+                isStreaming = false;
+                sendButton.disabled = false;
+                promptInput.focus();
+            }
+        }
+    </script>
+</body>
+</html>
