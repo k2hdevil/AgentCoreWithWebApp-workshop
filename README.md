@@ -232,3 +232,9 @@ http://127.0.0.1:8080 에 접속하여 순서대로 테스트합니다.
 ## License
 
 This project is licensed under the MIT-0 License.
+
+## 제작 정보
+
+- **원본 프로젝트**: [sample-amazon-bedrock-agentcore-onboarding](https://github.com/Kota-Kudo/sample-amazon-bedrock-agentcore-onboarding) — Amazon Bedrock AgentCore 온보딩 샘플 코드
+- **웹 애플리케이션 통합 및 워크샵 컨텐츠 생성**: [Kiro](https://kiro.dev) (AI-powered IDE)를 활용하여 개별 샘플 코드를 하나의 웹 애플리케이션으로 통합하고, 빈칸 채우기 워크샵 형식으로 변환
+- **컨텐츠 검수**: Human-in-the-Loop (HITL) 방식으로 빈칸 난이도, 힌트 정확성, 진행 순서를 검증 및 조정
