@@ -131,9 +131,12 @@ def setup_gateway(provider_name: str = PROVIDER_NAME, force: bool = False) -> di
         create_request = {
             "gatewayIdentifier": gateway_id,
             "name": target_name,
+            # TODO 16: Gateway Target의 타겟 설정 구조 — Lambda ARN 전달 키
+            # HINT: MCP Gateway에 Lambda 함수를 연결할 때 사용하는 설정 구조입니다.
+            # 참고: https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-create-target.html
             "targetConfiguration": {
                 "mcp": {
-                    "lambda": {
+                    "_____": {
                         "lambdaArn": config["lambda_arn"],
                         "toolSchema": {
                             "inlinePayload": tool_schema
@@ -141,7 +144,10 @@ def setup_gateway(provider_name: str = PROVIDER_NAME, force: bool = False) -> di
                     }
                 }
             },
-            "credentialProviderConfigurations": [{"credentialProviderType": "GATEWAY_IAM_ROLE"}]
+            # TODO 17: Gateway Target의 자격증명 공급자 유형
+            # HINT: Gateway가 Lambda를 호출할 때 사용할 인증 방식을 지정합니다.
+            # 참고: https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-create-target.html
+            "credentialProviderConfigurations": [{"credentialProviderType": "_____"}]
         }
 
         # Save gateway config before target creation (enables resume on partial failure)

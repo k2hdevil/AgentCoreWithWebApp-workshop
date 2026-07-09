@@ -45,3 +45,6 @@ agent/.bedrock_agentcore.yaml
 # Misc
 .agentcore.json
 uv.lock
+
+# Workshop solutions (답안 — repo에 포함하지 않음)
+solutions/

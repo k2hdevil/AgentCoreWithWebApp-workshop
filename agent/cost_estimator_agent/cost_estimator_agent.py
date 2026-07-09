@@ -93,7 +93,10 @@ class AWSCostEstimatorAgent:
         try:
             logger.info("Setting up AgentCore Code Interpreter...")
             self.code_interpreter = CodeInterpreter(self.region)
-            self.code_interpreter.start()
+            # TODO 15: Code Interpreter 세션을 시작하는 메서드 호출
+            # HINT: CodeInterpreter 클라이언트의 세션 시작 메서드입니다. 완료 후 반드시 stop()을 호출해야 합니다.
+            # 참고: https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/code-interpreter-start-session.html
+            self.code_interpreter."_____"()
             logger.info("✅ AgentCore Code Interpreter session started successfully")
         except Exception as e:
             logger.error(f"❌ Failed to setup Code Interpreter: {e}")
@@ -173,7 +176,10 @@ class AWSCostEstimatorAgent:
             aws_pricing_client = MCPClient(
                 lambda: stdio_client(StdioServerParameters(
                     command=uvx_path,
-                    args=["awslabs.aws-pricing-mcp-server@latest"],
+                    # TODO 7: AWS Pricing MCP Server 패키지 이름 지정
+                    # HINT: awslabs가 제공하는 AWS Pricing MCP 서버 패키지입니다.
+                    # 참고: https://awslabs.github.io/mcp/servers/aws-pricing-mcp-server/
+                    args=["_____"],
                     env=env_vars
                 ))
             )
@@ -204,9 +210,11 @@ class AWSCostEstimatorAgent:
             logger.info(f"🧮 Executing calculation: {description}")
             logger.debug(f"Code to execute:\n{calculation_code}")
             
-            # Execute code in secure AgentCore sandbox
-            response = self.code_interpreter.invoke("executeCode", {
-                "language": "python",
+            # TODO 6: Code Interpreter에서 코드를 실행하는 API 호출
+            # HINT: CodeInterpreter 클라이언트의 invoke 메서드에 액션 이름과 파라미터를 전달합니다.
+            # 참고: https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/code-interpreter-execute-code.html
+            response = self.code_interpreter.invoke("_____", {
+                "language": "_____",
                 "code": calculation_code
             })
             
@@ -251,7 +259,9 @@ class AWSCostEstimatorAgent:
                 pricing_tools = aws_pricing_client.list_tools_sync()
                 logger.info(f"Found {len(pricing_tools)} AWS pricing tools")
                 
-                # Create agent with both execute_cost_calculation and MCP pricing tools
+                # TODO 8: Strands Agent 생성 시 도구 목록 전달
+                # HINT: Agent에 사용할 도구(tool) 리스트를 전달합니다. 로컬 @tool 함수와 MCP 도구를 합칩니다.
+                # 참고: https://strandsagents.com/latest/user-guide/concepts/tools/mcp/
                 all_tools = [self.execute_cost_calculation] + pricing_tools
                 agent = Agent(
                     BedrockModel(
@@ -262,7 +272,7 @@ class AWSCostEstimatorAgent:
                         ),
                         model_id=DEFAULT_MODEL
                     ),
-                    tools=all_tools,
+                    "_____"=all_tools,
                     system_prompt=SYSTEM_PROMPT
                 )
                 

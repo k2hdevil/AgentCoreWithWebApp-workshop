@@ -98,11 +98,14 @@ def get_agentcore_client(region: str):
     """bedrock-agentcore boto3 클라이언트 생성"""
     config = Config(
         region_name=region,
-        read_timeout=600,
+        read_timeout=____,
         connect_timeout=60,
         retries={"max_attempts": 3, "mode": "adaptive"},
     )
-    return boto3.client("bedrock-agentcore", config=config)
+    # TODO 14: AgentCore 데이터 플레인 boto3 클라이언트 서비스명
+    # HINT: AgentCore의 데이터 플레인(Data Plane) 서비스 이름입니다. invoke_agent_runtime 등 런타임 호출에 사용합니다.
+    # 참고: https://docs.aws.amazon.com/boto3/latest/reference/services/bedrock-agentcore.html
+    return boto3.client("_____", config=config)
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -209,13 +212,18 @@ async def chat(request: Request):
 
         payload = json.dumps(payload_data).encode("utf-8")
 
-        # KEY POINT: invoke_agent_runtime은 스트리밍 응답을 반환
-        # - agentRuntimeArn: 배포된 에이전트 식별
-        # - runtimeSessionId: 세션 연속성 (Memory가 이 ID로 대화 스코프)
-        # - payload: 에이전트의 invoke() 함수가 받는 JSON
-        response = client.invoke_agent_runtime(
-            agentRuntimeArn=config["agent_arn"],
-            runtimeSessionId=session_id,
+        # TODO 9: AgentCore Runtime에 배포된 에이전트를 호출하는 API
+        # HINT: boto3 bedrock-agentcore 클라이언트의 에이전트 런타임 호출 메서드입니다.
+        # 참고: https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-invoke-agent.html
+        response = client."_____"(
+            # TODO 10: 배포된 에이전트를 식별하는 ARN 파라미터명
+            # HINT: AgentCore Runtime의 에이전트 ARN을 지정하는 파라미터입니다.
+            # 참고: https://docs.aws.amazon.com/botocore/latest/reference/services/bedrock-agentcore/client/invoke_agent_runtime.html
+            "_____"=config["agent_arn"],
+            # TODO 11: 세션 연속성을 위한 세션 ID 파라미터명 (최소 33자)
+            # HINT: Memory가 대화 맥락을 연결하는 데 사용하는 세션 식별자입니다.
+            # 참고: https://docs.aws.amazon.com/botocore/latest/reference/services/bedrock-agentcore/client/invoke_agent_runtime.html
+            "_____"=session_id,
             payload=payload,
         )
 

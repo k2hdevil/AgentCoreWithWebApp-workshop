@@ -68,7 +68,10 @@ def main():
 
     # Step 3: Create OAuth2 Credential Provider
     logger.info("Creating Identity Provider...")
-    identity_client = boto3.client("bedrock-agentcore-control", region_name=region)
+    # TODO 13: AgentCore Identity 제어 플레인 boto3 클라이언트 서비스명
+    # HINT: AgentCore의 제어 플레인(Control Plane) 서비스 이름입니다. 리소스 생성/삭제에 사용합니다.
+    # 참고: https://docs.aws.amazon.com/boto3/latest/reference/services/bedrock-agentcore-control.html
+    identity_client = boto3.client("_____", region_name=region)
 
     # Delete existing provider if any
     try:
@@ -78,9 +81,12 @@ def main():
     except Exception:
         pass
 
-    response = identity_client.create_oauth2_credential_provider(
+    # TODO 12: AgentCore Identity에 OAuth2 자격증명 공급자를 생성하는 API 호출
+    # HINT: bedrock-agentcore-control 클라이언트의 OAuth2 credential provider 생성 메서드입니다.
+    # 참고: https://docs.aws.amazon.com/boto3/latest/reference/services/bedrock-agentcore-control/client/create_oauth2_credential_provider.html
+    response = identity_client."_____"(
         name=PROVIDER_NAME,
-        credentialProviderVendor="CustomOauth2",
+        credentialProviderVendor="_____",
         oauth2ProviderConfigInput={
             "customOauth2ProviderConfig": {
                 "clientId": cognito_config["client_id"],

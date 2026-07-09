@@ -121,11 +121,14 @@ def _retrieve_history(session_id):
         return ""
 
     try:
-        events = client.list_events(
+        # TODO 2: Memory에서 이전 대화 이벤트를 조회하는 API 호출
+        # HINT: AgentCore Memory의 이벤트 목록 조회 메서드입니다.
+        # 참고: https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/short-term-memory-operations.html
+        events = client."_____"(
             memory_id=MEMORY_ID,
             actor_id=ACTOR_ID,
             session_id=session_id,
-            max_results=6
+            max_results=____
         )
         if not events:
             logger.info("No previous conversation found in memory")
@@ -162,13 +165,16 @@ def _store_conversation(session_id, user_input, result):
         return
 
     try:
-        client.create_event(
+        # TODO 3: Memory에 현재 대화를 저장하는 API 호출
+        # HINT: AgentCore Memory에 새 이벤트를 생성하여 대화를 저장합니다.
+        # 참고: https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/short-term-memory-operations.html
+        client."_____"(
             memory_id=MEMORY_ID,
             actor_id=ACTOR_ID,
             session_id=session_id,
             messages=[
-                (user_input, "USER"),
-                (result, "ASSISTANT")
+                (user_input, "_____"),
+                (result, "_____")
             ]
         )
         logger.info("Conversation stored in memory")
@@ -215,7 +221,10 @@ def _get_gateway_access_token():
         response = http_requests.post(
             token_endpoint,
             data={
-                "grant_type": "client_credentials",
+                # TODO 4: OAuth2 client_credentials 플로우의 grant_type 값
+                # HINT: M2M(Machine-to-Machine) 인증에 사용되는 OAuth2 grant type입니다.
+                # 참고: https://docs.aws.amazon.com/cognito/latest/developerguide/token-endpoint.html
+                "grant_type": "_____",
                 "scope": OAUTH_SCOPE,
             },
             auth=(client_id, client_secret),
@@ -246,9 +255,12 @@ def _get_gateway_tools(access_token):
         from mcp.client.streamable_http import streamablehttp_client
 
         def create_transport():
+            # TODO 5: Streamable HTTP MCP 전송 계층 생성
+            # HINT: Gateway URL과 Bearer 토큰을 Authorization 헤더로 전달합니다.
+            # 참고: https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-connect-mcp.html
             return streamablehttp_client(
-                GATEWAY_URL,
-                headers={"Authorization": f"Bearer {access_token}"}
+                "_____",
+                headers={"_____": f"Bearer {access_token}"}
             )
 
         mcp_client = MCPClient(create_transport)
@@ -264,7 +276,10 @@ def _get_gateway_tools(access_token):
 # - 세션 ID는 BedrockAgentCoreContext에서 추출 (클라이언트의 runtimeSessionId)
 # - KEY POINT: 모든 외부 연동은 best-effort — 실패해도 핵심 기능은 동작
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-@app.entrypoint
+# TODO 1: Runtime 엔트리포인트 데코레이터
+# HINT: BedrockAgentCoreApp의 엔트리포인트를 등록하는 데코레이터입니다.
+# 참고: https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-getting-started-toolkit.html
+@app."_____"
 def invoke(payload):
     user_input = payload.get("prompt")
     session_id = _get_session_id()

@@ -1,7 +1,12 @@
-# AWS Cost Estimator — Amazon Bedrock AgentCore Demo
+# Amazon Bedrock AgentCore 워크샵 — 빈칸 채우기 실습
 
-실시간 AWS 가격 데이터를 기반으로 아키텍처 비용을 견적하는 AI 에이전트입니다.
-Amazon Bedrock AgentCore의 주요 기능(Runtime, Memory, Gateway, Identity, Code Interpreter)을 하나의 웹 애플리케이션으로 통합한 데모입니다.
+실시간 AWS 가격 데이터를 기반으로 아키텍처 비용을 견적하는 AI 에이전트를 구축하며,
+Amazon Bedrock AgentCore의 핵심 기능(Runtime, Memory, Gateway, Identity, Code Interpreter)을 학습합니다.
+
+## 실습 목표
+
+코드의 빈칸(`"_____"` 또는 `____`)을 채워 AgentCore 에이전트를 완성하세요.
+각 빈칸 위에 `# HINT:` 주석과 공식 문서 링크가 제공됩니다.
 
 ## Architecture
 
@@ -13,7 +18,7 @@ Amazon Bedrock AgentCore의 주요 기능(Runtime, Memory, Gateway, Identity, Co
                        │ POST /api/chat
                        ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│  Web Backend (web/app.py)                                           │
+│  Web Backend (web/app.py)                        [TODO 9~11]        │
 │    - FastAPI 서버                                                    │
 │    - boto3 invoke_agent_runtime() 호출                               │
 │    - SSE 스트리밍 응답 처리                                           │
@@ -21,18 +26,18 @@ Amazon Bedrock AgentCore의 주요 기능(Runtime, Memory, Gateway, Identity, Co
                        │ invoke_agent_runtime API
                        ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│  AgentCore Runtime (agent/invoke.py)                                │
+│  AgentCore Runtime (agent/invoke.py)             [TODO 1~5]         │
 │                                                                     │
 │  ┌─── Memory ────────────────────────────────────────────────────┐  │
-│  │  list_events() → 이전 대화 조회                                │  │
-│  │  create_event() → 현재 대화 저장                               │  │
+│  │  list_events() → 이전 대화 조회            [TODO 2]            │  │
+│  │  create_event() → 현재 대화 저장           [TODO 3]            │  │
 │  └───────────────────────────────────────────────────────────────┘  │
 │                                                                     │
 │  ┌─── Agent (Strands + Claude Sonnet) ───────────────────────────┐  │
 │  │                                                               │  │
 │  │  ┌─────────────────┐  ┌──────────────────┐  ┌─────────────┐  │  │
 │  │  │ Code Interpreter│  │ AWS Pricing MCP  │  │ Gateway MCP │  │  │
-│  │  │ (보안 계산)      │  │ (가격 데이터)     │  │ (이메일 등) │  │  │
+│  │  │ [TODO 6]        │  │ [TODO 7]         │  │ [TODO 5]    │  │  │
 │  │  └────────┬────────┘  └────────┬─────────┘  └──────┬──────┘  │  │
 │  │           │                    │                    │         │  │
 │  └───────────┼────────────────────┼────────────────────┼─────────┘  │
@@ -43,42 +48,154 @@ Amazon Bedrock AgentCore의 주요 기능(Runtime, Memory, Gateway, Identity, Co
 │  └────────────────┘  └─────────────────┘  └────────────────────┘   │
 │                                                                     │
 │  ┌─── Identity ──────────────────────────────────────────────────┐  │
-│  │  Cognito OAuth M2M → Bearer Token → Gateway 인증              │  │
+│  │  Cognito OAuth M2M → Bearer Token → Gateway 인증 [TODO 4]    │  │
 │  └───────────────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-## AgentCore 서비스 통합
+## 빈칸 목록 (총 17개 TODO)
 
-| 서비스 | 역할 | 파일 |
-|--------|------|------|
-| **Runtime** | 에이전트를 클라우드에 배포/실행 | `agent/invoke.py` |
-| **Code Interpreter** | 보안 샌드박스에서 비용 계산 코드 실행 | `agent/cost_estimator_agent/cost_estimator_agent.py` |
-| **Memory (STM)** | 세션 내 대화 기록 저장/조회 | `agent/invoke.py` |
-| **Identity** | Cognito OAuth M2M으로 Gateway 인증 | `agent/invoke.py` |
-| **Gateway** | Lambda(markdown_to_email) 등 외부 도구 호출 | `agent/cost_estimator_agent/cost_estimator_agent.py` |
-| **Observability** | CloudWatch 로그 + X-Ray 트레이스 | Runtime 자동 구성 |
+### 파일 1: `agent/invoke.py` — Runtime 엔트리포인트
 
-## Project Structure
+| TODO | 난이도 | 설명 | 관련 서비스 |
+|------|--------|------|-------------|
+| **TODO 1** | ★★☆ | Runtime 엔트리포인트 데코레이터 | AgentCore Runtime |
+| **TODO 2** | ★★★ | Memory에서 이전 대화 조회 API + max_results 값 | AgentCore Memory |
+| **TODO 3** | ★★★ | Memory에 대화 저장 API + 메시지 역할(role) 지정 | AgentCore Memory |
+| **TODO 4** | ★★☆ | OAuth2 client_credentials 플로우의 grant_type | AgentCore Identity |
+| **TODO 5** | ★★★ | Gateway MCP 연결 시 URL과 인증 헤더 | AgentCore Gateway |
+
+### 파일 2: `agent/cost_estimator_agent/cost_estimator_agent.py` — 에이전트 핵심 로직
+
+| TODO | 난이도 | 설명 | 관련 서비스 |
+|------|--------|------|-------------|
+| **TODO 6** | ★★☆ | Code Interpreter invoke 액션명 + 언어 지정 | Code Interpreter |
+| **TODO 7** | ★★☆ | AWS Pricing MCP Server 패키지명 | MCP (Pricing) |
+| **TODO 8** | ★☆☆ | Strands Agent 생성 시 도구 목록 파라미터 | Strands Agents |
+| **TODO 15** | ★☆☆ | Code Interpreter 세션 시작 메서드 | Code Interpreter |
+
+### 파일 3: `web/app.py` — FastAPI 백엔드
+
+| TODO | 난이도 | 설명 | 관련 서비스 |
+|------|--------|------|-------------|
+| **TODO 9** | ★★★ | 에이전트 런타임 호출 메서드명 | AgentCore Runtime |
+| **TODO 10** | ★★☆ | 에이전트 ARN 파라미터명 | AgentCore Runtime |
+| **TODO 11** | ★★★ | 세션 ID 파라미터명 (최소 33자 제약) | AgentCore Runtime |
+| **TODO 14** | ★★☆ | AgentCore 데이터 플레인 boto3 서비스명 + read_timeout 값 | AgentCore Runtime |
+
+### 파일 4: `identity/setup_identity.py` — Identity 설정
+
+| TODO | 난이도 | 설명 | 관련 서비스 |
+|------|--------|------|-------------|
+| **TODO 12** | ★★★ | OAuth2 credential provider 생성 API + vendor 값 | AgentCore Identity |
+| **TODO 13** | ★★☆ | AgentCore 제어 플레인 boto3 서비스명 | AgentCore Identity |
+
+### 파일 5: `gateway/setup_outbound_gateway.py` — Gateway 설정
+
+| TODO | 난이도 | 설명 | 관련 서비스 |
+|------|--------|------|-------------|
+| **TODO 16** | ★★★ | Gateway Target 설정의 Lambda 키 이름 | AgentCore Gateway |
+| **TODO 17** | ★★☆ | credentialProviderType 값 (IAM 역할 방식) | AgentCore Gateway |
+
+## 실습 진행 순서
+
+### Step 1: Identity 설정 (`identity/setup_identity.py`)
+
+Cognito User Pool과 AgentCore Identity Provider를 생성합니다.
+
+```bash
+cd identity
+uv run python setup_identity.py
+```
+
+**학습 포인트:**
+- `bedrock-agentcore-control` 클라이언트로 Identity 리소스 관리
+- OAuth2 credential provider 개념 이해
+
+### Step 2: 에이전트 핵심 로직 (`agent/cost_estimator_agent/cost_estimator_agent.py`)
+
+Code Interpreter와 MCP 도구를 연결하는 에이전트를 구현합니다.
+
+**학습 포인트:**
+- Code Interpreter 세션 시작/실행/정리 라이프사이클
+- MCP(Model Context Protocol)로 외부 도구 연결
+- Strands Agent에 도구 리스트 전달
+
+### Step 3: Runtime 엔트리포인트 (`agent/invoke.py`)
+
+Memory, Gateway, Identity를 통합한 Runtime 엔트리포인트를 완성합니다.
+
+**학습 포인트:**
+- `@app.entrypoint` 데코레이터로 Runtime 함수 등록
+- Memory의 list_events/create_event로 대화 맥락 관리
+- Cognito client_credentials 플로우로 Gateway 인증
+- streamablehttp_client로 Gateway MCP 연결
+
+```bash
+cd agent
+uv run agentcore deploy --env AWS_REGION=us-west-2
+```
+
+### Step 4: 웹 백엔드 (`web/app.py`)
+
+배포된 에이전트를 호출하는 웹 인터페이스를 완성합니다.
+
+**학습 포인트:**
+- `invoke_agent_runtime` API의 파라미터 구조
+- `runtimeSessionId`로 세션 연속성 확보
+- 스트리밍 응답 처리
+
+```bash
+cd web
+uv run uvicorn app:app --reload --port 8080
+```
+
+### Step 5: 동작 확인
+
+http://127.0.0.1:8080 에 접속하여 "EC2 t3.micro 24/7 비용 견적" 등을 입력합니다.
+
+## 빈칸 규칙
+
+| 표기 | 의미 | 예시 |
+|------|------|------|
+| `"_____"` (따옴표 + 밑줄 5개) | 문자형 값을 채워야 함 | `"entrypoint"`, `"client_credentials"` |
+| `____` (밑줄 4개) | 숫자형 값을 채워야 함 | `6`, `900` |
+
+## 정답 확인
+
+정답은 `solutions/` 폴더에 있습니다:
 
 ```
-.
-├── agent/                              # AgentCore Runtime에 배포되는 코드
-│   ├── invoke.py                       # 엔트리포인트 (Memory + Gateway 통합)
-│   ├── requirements.txt                # 런타임 의존성
-│   ├── inbound_authorizer.json         # Cognito/Identity 설정 (Gateway 인증용)
-│   ├── .bedrock_agentcore.yaml         # 에이전트 ARN, 메모리 ID (agentcore deploy가 생성)
+solutions/
+├── agent/
+│   ├── invoke.py                          # TODO 1~5 정답
 │   └── cost_estimator_agent/
-│       ├── __init__.py
-│       ├── config.py                   # 시스템 프롬프트, 모델 설정
-│       └── cost_estimator_agent.py     # 에이전트 핵심 로직
-├── web/                                # 웹 UI (프론트엔드 + 백엔드)
-│   ├── app.py                          # FastAPI 백엔드
-│   └── static/
-│       └── index.html                  # 채팅 프론트엔드
-├── pyproject.toml                      # Python 프로젝트 설정
-└── README.md                           # 이 파일
+│       └── cost_estimator_agent.py        # TODO 6~8, 15 정답
+├── web/
+│   └── app.py                             # TODO 9~11, 14 정답
+├── identity/
+│   └── setup_identity.py                  # TODO 12~13 정답
+└── gateway/
+    └── setup_outbound_gateway.py          # TODO 16~17 정답
 ```
+
+## 참고 문서
+
+| 서비스 | 공식 문서 |
+|--------|----------|
+| AgentCore Runtime | https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-getting-started-toolkit.html |
+| AgentCore Memory | https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/short-term-memory-operations.html |
+| AgentCore Code Interpreter | https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/code-interpreter-execute-code.html |
+| Code Interpreter 세션 시작 | https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/code-interpreter-start-session.html |
+| AgentCore Identity | https://docs.aws.amazon.com/boto3/latest/reference/services/bedrock-agentcore-control/client/create_oauth2_credential_provider.html |
+| AgentCore Control Plane (boto3) | https://docs.aws.amazon.com/boto3/latest/reference/services/bedrock-agentcore-control.html |
+| AgentCore Data Plane (boto3) | https://docs.aws.amazon.com/boto3/latest/reference/services/bedrock-agentcore.html |
+| AgentCore Gateway | https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-connect-mcp.html |
+| Gateway Target 생성 | https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-create-target.html |
+| invoke_agent_runtime API | https://docs.aws.amazon.com/botocore/latest/reference/services/bedrock-agentcore/client/invoke_agent_runtime.html |
+| Cognito Token Endpoint | https://docs.aws.amazon.com/cognito/latest/developerguide/token-endpoint.html |
+| Strands Agents MCP | https://strandsagents.com/latest/user-guide/concepts/tools/mcp/ |
+| AWS Pricing MCP Server | https://awslabs.github.io/mcp/servers/aws-pricing-mcp-server/ |
 
 ## Prerequisites
 
@@ -87,144 +204,30 @@ Amazon Bedrock AgentCore의 주요 기능(Runtime, Memory, Gateway, Identity, Co
 - AWS CLI 또는 환경변수로 자격증명 설정
 - `uv` 패키지 매니저
 
-## Quick Start
+## Project Structure
 
-### 1. 에이전트 배포
-
-```bash
-cd agent
-uv run agentcore configure \
-  --entrypoint ./invoke.py \
-  --name cost_estimator_agent \
-  --requirements-file ./requirements.txt \
-  --deployment-type direct_code_deploy \
-  --region us-west-2
-
-uv run agentcore deploy --env AWS_REGION=us-west-2
 ```
-
-### 2. 웹 서버 실행
-
-```bash
-cd web
-uv run uvicorn app:app --reload --port 8080
+.
+├── agent/                              # AgentCore Runtime에 배포되는 코드
+│   ├── invoke.py                       # [TODO 1~5] 엔트리포인트
+│   ├── requirements.txt                # 런타임 의존성
+│   ├── inbound_authorizer.json         # Cognito/Identity 설정
+│   └── cost_estimator_agent/
+│       ├── config.py                   # 시스템 프롬프트, 모델 설정
+│       └── cost_estimator_agent.py     # [TODO 6~8, 15] 에이전트 핵심 로직
+├── web/                                # 웹 UI
+│   ├── app.py                          # [TODO 9~11, 14] FastAPI 백엔드
+│   └── static/index.html              # 채팅 프론트엔드
+├── identity/
+│   └── setup_identity.py              # [TODO 12~13] Identity 설정
+├── gateway/
+│   ├── setup_outbound_gateway.py      # [TODO 16~17] Gateway 설정
+│   ├── src/app.py                     # Lambda 함수 (markdown_to_email)
+│   └── template.yaml                  # SAM 템플릿
+├── solutions/                          # 정답 파일
+├── pyproject.toml
+└── README.md                           # 이 파일 (워크샵 가이드)
 ```
-
-### 3. 브라우저에서 접속
-
-http://127.0.0.1:8080
-
-## How It Works
-
-1. 사용자가 AWS 아키텍처를 설명 (예: "EC2 t3.micro 24/7 비용")
-2. 웹 백엔드가 AgentCore Runtime의 `invoke_agent_runtime` API 호출
-3. Runtime 내부에서:
-   - Memory에서 이전 대화 컨텍스트 조회
-   - Claude Sonnet이 아키텍처 분석
-   - AWS Pricing MCP로 실시간 가격 데이터 조회
-   - Code Interpreter로 비용 계산
-   - (선택) Gateway를 통해 이메일 발송
-   - Memory에 현재 대화 저장
-4. 응답이 SSE 스트리밍으로 브라우저에 실시간 표시
-
-## Key Design Decisions
-
-- **Best-effort 패턴**: Memory/Gateway 실패 시에도 핵심 기능(비용 견적)은 정상 동작
-- **Lazy initialization**: Cold start 30초 제한 내 로드를 위해 MemoryClient를 지연 초기화
-- **세션 연속성**: 같은 `runtimeSessionId`를 재사용하면 Memory가 대화 맥락 연결
-- **리소스 관리**: Context manager로 Code Interpreter 세션 라이프사이클 관리 (누수 방지)
-- **멀티바이트 안전**: UTF-8 incremental decoder로 한글 응답의 청크 경계 문제 해결
-
-## Environment Variables
-
-| 변수 | 설명 | 기본값 |
-|------|------|--------|
-| `AGENT_ARN` | AgentCore Runtime ARN | config yaml에서 로드 |
-| `AWS_REGION` | AWS 리전 | us-west-2 |
-| `MEMORY_ID` | AgentCore Memory ID | config에서 자동 |
-| `GATEWAY_URL` | Gateway MCP 엔드포인트 | 하드코딩 기본값 |
-
-## Deploying to a Different AWS Account
-
-다른 AWS 계정에 이 앱을 배포할 때 변경해야 하는 항목입니다.
-
-### 1. 필수 변경 사항
-
-| 파일 | 변경 항목 | 설명 |
-|------|----------|------|
-| `agent/.bedrock_agentcore.yaml` | `aws.account` | 새 계정 ID (12자리) |
-| `agent/.bedrock_agentcore.yaml` | `aws.execution_role` | 새 계정의 IAM 역할 ARN |
-| `agent/.bedrock_agentcore.yaml` | `aws.s3_path` | 새 계정의 S3 버킷 (자동 생성 가능) |
-| `agent/.bedrock_agentcore.yaml` | `bedrock_agentcore.agent_id` | 배포 후 자동 할당됨 (삭제하고 재배포) |
-| `agent/.bedrock_agentcore.yaml` | `bedrock_agentcore.agent_arn` | 배포 후 자동 할당됨 (삭제하고 재배포) |
-| `agent/.bedrock_agentcore.yaml` | `memory.memory_id` | 새 메모리 생성 후 ID 교체 |
-| `agent/.bedrock_agentcore.yaml` | `memory.memory_arn` | 새 메모리 생성 후 ARN 교체 |
-
-### 2. Identity/Gateway 사용 시 추가 변경
-
-| 파일 | 변경 항목 | 설명 |
-|------|----------|------|
-| `agent/inbound_authorizer.json` | 전체 재생성 | Identity 설정 후 새 파일로 교체 |
-| `agent/invoke.py` | `MEMORY_ID` 기본값 | 새 메모리 ID로 변경 |
-| `agent/invoke.py` | `GATEWAY_URL` 기본값 | 새 Gateway 엔드포인트로 변경 |
-
-### 3. 권장 배포 절차 (새 계정)
-
-```bash
-# 1. agent/.bedrock_agentcore.yaml 삭제 (새로 생성됨)
-rm agent/.bedrock_agentcore.yaml
-
-# 2. 에이전트 configure (새 계정에 맞게 자동 설정)
-cd agent
-uv run agentcore configure \
-  --entrypoint ./invoke.py \
-  --name cost_estimator_agent \
-  --requirements-file ./requirements.txt \
-  --deployment-type direct_code_deploy \
-  --region us-west-2
-
-# 3. 배포
-uv run agentcore deploy --env AWS_REGION=us-west-2
-
-# 4. (선택) Identity 설정 후 inbound_authorizer.json 교체
-# Gateway 사용 시, 새 Cognito 설정 파일을 agent/ 폴더에 배치 후 재배포
-uv run agentcore deploy --env AWS_REGION=us-west-2 --env GATEWAY_URL=<새 Gateway URL>
-
-# 5. 웹 서버 실행
-cd ../web
-uv run uvicorn app:app --reload --port 8080
-```
-
-### 4. IAM 권한 요구사항
-
-새 계정의 에이전트 실행 역할에 필요한 권한:
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "bedrock:InvokeModel",
-        "bedrock-agentcore:*"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
-      "Resource": "arn:aws:logs:*:*:log-group:/aws/bedrock-agentcore/*"
-    }
-  ]
-}
-```
-
-> **Note**: 프로덕션 환경에서는 `Resource: "*"` 대신 구체적인 ARN으로 범위를 좁혀야 합니다.
 
 ## License
 
