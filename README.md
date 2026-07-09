@@ -161,24 +161,6 @@ http://127.0.0.1:8080 에 접속하여 "EC2 t3.micro 24/7 비용 견적" 등을 
 | `"_____"` (따옴표 + 밑줄 5개) | 문자형 값을 채워야 함 | `"entrypoint"`, `"client_credentials"` |
 | `____` (밑줄 4개) | 숫자형 값을 채워야 함 | `6`, `900` |
 
-## 정답 확인
-
-정답은 `solutions/` 폴더에 있습니다:
-
-```
-solutions/
-├── agent/
-│   ├── invoke.py                          # TODO 1~5 정답
-│   └── cost_estimator_agent/
-│       └── cost_estimator_agent.py        # TODO 6~8, 15 정답
-├── web/
-│   └── app.py                             # TODO 9~11, 14 정답
-├── identity/
-│   └── setup_identity.py                  # TODO 12~13 정답
-└── gateway/
-    └── setup_outbound_gateway.py          # TODO 16~17 정답
-```
-
 ## 참고 문서
 
 | 서비스 | 공식 문서 |
