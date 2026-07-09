@@ -48,3 +48,6 @@ uv.lock
 
 # Workshop solutions (답안 — repo에 포함하지 않음)
 solutions/
+
+# Kiro IDE 설정 (개발 도구 전용)
+.kiro/
