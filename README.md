@@ -97,7 +97,7 @@ Amazon Bedrock AgentCore의 핵심 기능(Runtime, Memory, Gateway, Identity, Co
 | **TODO 16** | ★★★ | Gateway Target 설정의 Lambda 키 이름 | AgentCore Gateway |
 | **TODO 17** | ★★☆ | credentialProviderType 값 (IAM 역할 방식) | AgentCore Gateway |
 
-## 실습 진행 순서
+## 진행 순서
 
 ### Step 1: Identity 설정 (`identity/setup_identity.py`)
 
@@ -136,7 +136,22 @@ cd agent
 uv run agentcore deploy --env AWS_REGION=us-west-2
 ```
 
-### Step 4: 웹 백엔드 (`web/app.py`)
+### Step 4: Gateway 설정 (`gateway/setup_outbound_gateway.py`)
+
+Lambda 함수를 AgentCore Gateway에 MCP Target으로 등록합니다.
+
+```bash
+cd gateway
+./deploy.sh your-verified-email@example.com   # Lambda 배포
+uv run python setup_outbound_gateway.py        # Gateway + Target 생성
+```
+
+**학습 포인트:**
+- Gateway Target의 `targetConfiguration.mcp.lambda` 구조
+- `credentialProviderType`으로 인증 방식 지정
+- Lambda를 MCP 도구로 노출하는 패턴
+
+### Step 5: 웹 백엔드 (`web/app.py`)
 
 배포된 에이전트를 호출하는 웹 인터페이스를 완성합니다.
 
@@ -150,7 +165,7 @@ cd web
 uv run uvicorn app:app --reload --port 8080
 ```
 
-### Step 5: 동작 확인
+### Step 6: 동작 확인
 
 http://127.0.0.1:8080 에 접속하여 "EC2 t3.micro 24/7 비용 견적" 등을 입력합니다.
 
