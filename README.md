@@ -121,22 +121,7 @@ Code Interpreter와 MCP 도구를 연결하는 에이전트를 구현합니다.
 - MCP(Model Context Protocol)로 외부 도구 연결
 - Strands Agent에 도구 리스트 전달
 
-### Step 3: Runtime 엔트리포인트 (`agent/invoke.py`)
-
-Memory, Gateway, Identity를 통합한 Runtime 엔트리포인트를 완성합니다.
-
-**학습 포인트:**
-- `@app.entrypoint` 데코레이터로 Runtime 함수 등록
-- Memory의 list_events/create_event로 대화 맥락 관리
-- Cognito client_credentials 플로우로 Gateway 인증
-- streamablehttp_client로 Gateway MCP 연결
-
-```bash
-cd agent
-uv run agentcore deploy --env AWS_REGION=us-west-2
-```
-
-### Step 4: Gateway 설정 (`gateway/setup_outbound_gateway.py`)
+### Step 3: Gateway 설정 (`gateway/setup_outbound_gateway.py`)
 
 Lambda 함수를 AgentCore Gateway에 MCP Target으로 등록합니다.
 
@@ -150,6 +135,21 @@ uv run python setup_outbound_gateway.py        # Gateway + Target 생성
 - Gateway Target의 `targetConfiguration.mcp.lambda` 구조
 - `credentialProviderType`으로 인증 방식 지정
 - Lambda를 MCP 도구로 노출하는 패턴
+
+### Step 4: Runtime 엔트리포인트 (`agent/invoke.py`)
+
+Memory, Gateway, Identity를 통합한 Runtime 엔트리포인트를 완성합니다.
+
+**학습 포인트:**
+- `@app.entrypoint` 데코레이터로 Runtime 함수 등록
+- Memory의 list_events/create_event로 대화 맥락 관리
+- Cognito client_credentials 플로우로 Gateway 인증
+- streamablehttp_client로 Gateway MCP 연결
+
+```bash
+cd agent
+uv run agentcore deploy --env AWS_REGION=us-west-2
+```
 
 ### Step 5: 웹 백엔드 (`web/app.py`)
 
