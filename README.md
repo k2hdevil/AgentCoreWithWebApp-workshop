@@ -225,7 +225,6 @@ http://127.0.0.1:8080 에 접속하여 순서대로 테스트합니다.
 │   ├── setup_outbound_gateway.py      # [TODO 16~17] Gateway 설정
 │   ├── src/app.py                     # Lambda 함수 (markdown_to_email)
 │   └── template.yaml                  # SAM 템플릿
-├── solutions/                          # 정답 파일
 ├── pyproject.toml
 └── README.md                           # 이 파일 (워크샵 가이드)
 ```
