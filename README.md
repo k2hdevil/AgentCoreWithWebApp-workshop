@@ -170,8 +170,18 @@ uv run uvicorn app:app --reload --port 8080
 http://127.0.0.1:8080 에 접속하여 순서대로 테스트합니다.
 
 1. **Runtime 동작 확인** — "서울 리전의 EC2 t3.micro 24/7 비용 견적" 입력
+
+![Runtime 동작 확인](asset/01.runtime.png)
+
 2. **Memory 동작 확인** — "버지니아 리전은 어떤가요?" 입력 (이전 대화 맥락을 기억하는지 확인)
+
+![Memory 동작 확인](asset/02.memory.png)
+
 3. **Gateway 동작 확인** — "버지니아 리전과 서울 리전을 비교한 견적을 your-verified-email@example.com으로 보내주세요" 입력
+
+![Gateway 동작 확인](asset/03.gateway.png)
+
+![Gateway 이메일 수신 확인](asset/03.gateway-2.png)
 
 ## 빈칸 규칙
 
